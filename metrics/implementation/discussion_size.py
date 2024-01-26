@@ -30,7 +30,7 @@ class DiscussionSize:
         if pull:
             database = self.database['pull_requests']
 
-        query_result = database.find({"merged": True})
+        query_result = database.find({})
 
         for pull_request in query_result:
 

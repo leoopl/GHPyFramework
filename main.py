@@ -85,8 +85,8 @@ class Main:
             gender = GenderDiversity(database)
             gender.gender_extraction()
             gender.team_gender()
-            # User Metrics
-            # self._run_user_metrics(project_owner, project_name, database)
+            # User Metrics AQUI
+            self._run_user_metrics(project_owner, project_name, database)
 
             print("________________________")
 
@@ -189,10 +189,10 @@ class Main:
         # NumberOf(project_owner, project_name, database).get_number_of_words_comments_by_user()
 
     def run(self):
-        #self.run_collector()
+        self.run_collector()
         #self.pre_processing_data_before_metrics()
-        #self.run_metrics()
-        SmellsMain().run()
+        # self.run_metrics()
+        # SmellsMain().run()
 
     def export_cases(self):
 

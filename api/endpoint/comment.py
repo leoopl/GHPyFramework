@@ -44,8 +44,10 @@ class CommentAPI(APIInterface):
             pulls = self.database_pulls.find({}, no_cursor_timeout=True)
 
             for pull in pulls:
+                """filtro de comentarios
+                """
                 number_comments = int(pull['comments'])
-                if number_comments == 0:
+                if number_comments > 10:
                     continue
 
                 if review:
