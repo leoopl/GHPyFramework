@@ -206,7 +206,7 @@ class APICollector(object):
         :rtype: list
         """
         print('Collecting Users')
-        # user_api = UsersAPI(owner, project, self.database)
+        user_api = UsersAPI(owner, project, self.database)
 
         users = set()
 
@@ -226,7 +226,7 @@ class APICollector(object):
         for user in commits_by_user:
             users.add(user['_id'])
 
-        # for user in users:
-        #     if not user:
-        #         continue
-        #     user_api.collect_single(user)
+        for user in users:
+            if not user:
+                continue
+            user_api.collect_single(user)

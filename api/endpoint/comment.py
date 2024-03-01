@@ -54,8 +54,8 @@ class CommentAPI(APIInterface):
                     self.collect_single_review(str(pull['number']))
                 else:
                     comment, end = self.collect_single(str(pull['number']))
-                    if end:
-                        break
+                    # if end:
+                    #     break
         except:
             pass
 
@@ -72,9 +72,9 @@ class CommentAPI(APIInterface):
         while True:
 
             comment = self.database_comments.find_one({'issue_number': int(issue_number)})
-            if comment:
-                print('Comments of Issue number ' + str(issue_number) + ' already in the database.')
-                return comment, True
+            # if comment:
+            #     print('Comments of Issue number ' + str(issue_number) + ' already in the database.')
+            #     return comment, True
 
             request_url = self.api_url + self.owner + '/' + self.repo + '/issues/' + str(issue_number) + \
                           '/comments?page=' + str(page)

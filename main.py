@@ -45,11 +45,11 @@ class Main:
 
             collector.collect_issues(project_owner, project_name)
             collector.collect_pulls(project_owner, project_name)
-            collector.collect_commits(project_owner, project_name)
+            # collector.collect_commits(project_owner, project_name)
 
             collector.collect_comments(project_owner, project_name)
             collector.collect_comments_pulls(project_owner, project_name)
-            collector.collect_users(project_owner, project_name)
+            # collector.collect_users(project_owner, project_name)
 
     def pre_processing_data_before_metrics(self):
         for project in self.projects:
