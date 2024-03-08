@@ -23,6 +23,7 @@ from refactorings.refactoring import RefactoringManager
 from smells_main import SmellsMain
 from utils.json_handler import JSONHandler
 
+from metrics.implementation.contributions import ContributionsAPI
 
 class Main:
 
@@ -43,13 +44,13 @@ class Main:
 
             collector = APICollector(project_name, database)
 
-            collector.collect_issues(project_owner, project_name)
-            collector.collect_pulls(project_owner, project_name)
+            # collector.collect_issues(project_owner, project_name)
+            # collector.collect_pulls(project_owner, project_name)
             # collector.collect_commits(project_owner, project_name)
 
-            collector.collect_comments(project_owner, project_name)
-            collector.collect_comments_pulls(project_owner, project_name)
-            # collector.collect_users(project_owner, project_name)
+            # collector.collect_comments(project_owner, project_name)
+            # collector.collect_comments_pulls(project_owner, project_name)
+            collector.collect_users(project_owner, project_name)
 
     def pre_processing_data_before_metrics(self):
         for project in self.projects:
@@ -189,10 +190,25 @@ class Main:
         # NumberOf(project_owner, project_name, database).get_number_of_words_comments_by_user()
 
     def run(self):
-        self.run_collector()
+        # self.run_collector()
         #self.pre_processing_data_before_metrics()
         # self.run_metrics()
         # SmellsMain().run()
+        self.contribuition()
+
+###############################################################################################
+    def contribuition(self):
+        GithubGraphql = ContributionsAPI()
+        for project in self.projects:
+            project_name = project['repo']
+            project_owner = project['owner']
+
+            database = self.mongo_connection[project_owner + '-' + project_name]
+            users = list(database['users_api'].find({}))
+            for user in users:
+                # GithubGraphql.getAllContributionsFromUser(user['login'])
+                NumberOf(project_owner, project_name, database).get_number_of_contributions_by_user(user['login'])
+###############################################################################################
 
     def export_cases(self):
 

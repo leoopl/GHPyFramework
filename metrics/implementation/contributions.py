@@ -1,23 +1,34 @@
 import requests
 from datetime import datetime
+from pymongo.database import Database
 from dateutil.relativedelta import relativedelta
 
 
-class graphQL:
+class ContributionsAPI:
 
-	def __init__(self, github_token):
-		self.headers = {"Authorization": f"token {github_token}"}
+	def __init__(self):
+		self.github_token = ["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", "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"]
+		# self.database = database
+		self.possiton = 0
+		self.tokens_len = len(self.github_token)
+		self.headers = {"Authorization": f"token {self.github_token[self.possiton]}"}
 
 	def run_query(self, query, variables):
 		request = requests.post('https://api.github.com/graphql', json={'query': query, 'variables': variables}, headers=self.headers)
 		if request.status_code == 200:
 			return request.json()
+		elif request.status_code == 403 or request.status_code == 401:
+			self.possiton = self.possiton + 1
+			if self.possiton == self.tokens_len:
+				self.possiton = 0
+			self.headers = {"Authorization": f"token {self.github_token[self.possiton]}"}
+			return self.run_query(query, variables)
 		else:
 			raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
 	
 
 
-	def getAllContributionsFromUser(self, user):
+	def getAllContributionsFromUser(self, user: str):
 		today = datetime.now()
 		one_yrs_ago = today - relativedelta(years=1)
 
@@ -42,11 +53,12 @@ class graphQL:
 		}	
 
 		result = self.run_query(query, variables) #execute query
-		return result["data"]["user"]["contributionsCollection"]["contributionCalendar"]["totalContributions"]
+		contributions = result["data"]["user"]["contributionsCollection"]["contributionCalendar"]["totalContributions"]
+		# self.database['users_api'].insert_one({"contributions_number": contributions})
+		print(contributions)
 
-token = "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"
-GithubGraphql = graphQL(token)
+GithubGraphql = ContributionsAPI()
 users = ["leoopl", "Miller202", "Raksantos", "AndressaM"]
 for user in users:
-	contributions = GithubGraphql.getAllContributionsFromUser(user)
-	print(contributions)
+	GithubGraphql.getAllContributionsFromUser(user)
+	

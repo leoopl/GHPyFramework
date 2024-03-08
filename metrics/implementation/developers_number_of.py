@@ -2,6 +2,8 @@ import re
 from os import listdir
 from os.path import isfile, join
 from statistics import median
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from bson import ObjectId
 from pymongo.database import Database
@@ -9,6 +11,7 @@ from pymongo.database import Database
 from utils.csv_handler import CSVHandler
 from utils.date import DateUtils
 from utils.json_handler import JSONHandler
+from utils.api_call_handler import APICallHandler
 
 __author__ = "Caio Barbosa"
 __license__ = "GPL"
@@ -26,9 +29,41 @@ class NumberOf:
         self.owner = owner
         self.repo = repo
         self.database = database
+        self.apiCall = APICallHandler()
 
     # Number of Merged PR
     # Number of words (Mean by comment)
+        
+    def get_number_of_contributions_by_user(self, user: str):
+        today = datetime.now()
+        one_yrs_ago = today - relativedelta(years=1)
+        
+        today_iso_date = today.isoformat()
+        one_yrs_ago_iso_date = one_yrs_ago.isoformat()
+		
+        query = '''
+			query($user : String!, $from: DateTime!, $to: DateTime!) { 
+				user(login: $user) {
+					contributionsCollection(from: $from, to: $to) {
+						contributionCalendar {
+							totalContributions
+						}
+					}
+				}
+			}'''
+
+        variables = {
+  			"user": user,
+  			"from": one_yrs_ago_iso_date,
+			"to": today_iso_date
+		}	
+
+        result = self.apiCall.graphql_request(query, variables) #execute query
+        contributions = result["data"]["user"]["contributionsCollection"]["contributionCalendar"]["totalContributions"]
+        self.database['users_api'].insert_one({"contributions_number": contributions})
+        print(contributions)
+
+
 
     def get_number_of_comments_by_user(self):
         """

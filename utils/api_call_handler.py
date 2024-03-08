@@ -11,6 +11,7 @@ class APICallHandler:
         self.tokens_len = len(self.config['tokens'])
         self.username = self.config['tokens'][self.position]['username']
         self.auth_token = self.config['tokens'][self.position]['token']
+        self.headers = {"Authorization": f"token {self.auth_token}"}
 
     def request(self, request_url):
 
@@ -50,3 +51,18 @@ class APICallHandler:
                 retry = retry + 1
 
         return request.json()
+    
+    # GRAPHQL API
+    def graphql_request(self, query, variables):
+        request = requests.post('https://api.github.com/graphql', json={'query': query, 'variables': variables}, headers=self.headers)
+        if request.status_code == 200:
+            return request.json()
+        elif request.status_code == 403 or request.status_code == 401:
+            self.possiton = self.possiton + 1
+            if self.possiton == self.tokens_len:
+                self.possiton = 0
+            self.auth_token = self.config['tokens'][self.position]['token']
+            self.headers = {"Authorization": f"token {self.auth_token}"}
+            return self.run_query(query, variables)
+        else:
+            raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query))
